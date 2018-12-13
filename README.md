@@ -1,2 +1,3 @@
 # Learning-program
-まだ方針は決まっとりません
+KenTei-Kun  ~KTK~
+とりあえず漢字や英語の勉強ができます
