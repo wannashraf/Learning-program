@@ -31,10 +31,27 @@ int main(){
 
 void Menu(){
 	int Num;			
-	char Numc[10];
+	char Numc[10],Log[20];
+	bool check;
 
-	printf("ログインしてください\n");
-	Login();
+	check = false;
+	printf("ログインしてください\nアカウントがなければ「Create」と、ある場合は「Login」と入力してください。\n\n");
+	while (1)
+	{
+		scanf(" → %s", Log);
+		if (strcmp(Log, "Create") == 0) {
+			check = true;
+			Create();
+		}
+		else if (strcmp(Log, "Login") == 0) {
+			check = true;
+			Login();
+		}
+		else {
+			printf("\n入力が間違っています\n「Login」または「Create」と入力してください\n");
+		}
+		if (check)break;
+	}
 
 	while(1){
 		printf("＊何をしますか？＊\n");
@@ -84,5 +101,6 @@ void Eigo() {
 }
 
 void Status() {
-
+	printf("-----ここではあなたの今までのデータが記録されています-----\n\n");
+	
 }
