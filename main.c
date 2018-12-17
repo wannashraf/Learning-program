@@ -32,7 +32,7 @@ struct Userstats
 
 int main() {
 
-	printf("<< <   KenTei - Kun - KTK - >> >\n\n");
+	printf("<< <   KenTei - Kun - KTK - > >>\n\n");
 	printf("検定用学習プログラム 「KenTei-Kun」へようこそ！\n\n");
 
 	Menu();
@@ -174,6 +174,7 @@ void Create() {
 	fp = fopen("", "a");//情報元ファイル名
 	fprintf(fp, "%07d %s %s 0 1 1\n", id, Pass, Name);
 	fclose(fp);
+	Login();
 }
 
 void Login() {
