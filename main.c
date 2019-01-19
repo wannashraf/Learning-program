@@ -13,6 +13,7 @@
 void Menu();
 int Create();
 int Login();
+int Quit();
 void Logout();
 void Save();
 void ChangeName();
@@ -86,7 +87,7 @@ void Menu() {
 }
 
 int Create() {
-	int i, id;
+	int id;
 	char c, Name[20], Pass[20], re_Pass[20];
 	FILE *fp;
 
