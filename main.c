@@ -15,6 +15,8 @@ int Create();
 int Login();
 void Logout();
 void Save();
+void ChangeName();
+void ChangePass();
 void Kanji();
 void Eigo();
 void Status();
@@ -98,7 +100,7 @@ int Create() {
 	fclose(fp);
 
 	for (;;) {
-		printf("ユーザー名を入力してください。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
+		printf("ユーザー名を入力してください。\n後から変更できます。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
 		printf("->");
 		scanf("%s", Name);
 		if (!strcmp(Name, "quit")) {//中断処理
@@ -119,7 +121,7 @@ int Create() {
 	term.c_lflag &= ~ECHO;
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 	tmp = fgetc(stdin);
-	printf("パスワードを入力してください。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
+	printf("パスワードを入力してください。\n後から変更できます。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
 	printf("->");
 	for (i = 0; i < 19; i++) {
 	tmp = fgetc(stdin);
@@ -167,7 +169,7 @@ int Create() {
 	//windws用
 	for (;;) {
 		for (;;) {
-			printf("パスワードを入力してください。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
+			printf("パスワードを入力してください。\n後から変更できます。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
 			printf("->");
 			system("stty -echo");
 			scanf("%s", Pass);
@@ -323,12 +325,18 @@ int Quit() {
 	char r[20];
 	int choice;
 	for (;;) {
-		printf("現在の作業を中断し、前のメニューへ戻りますか？\n1:はい\n2:いいえ\n->");
+		printf("現在の作業を中止し、前のメニューへ戻りますか？\n1:はい\n2:いいえ\n->");
 		scanf("%s", r);
 		if (strlen(r) == 1) {
 			choice = r[0] - 48;
-			if (choice == 1) return 0;
-			else if (choice == 2) return 1;
+			if (choice == 1) {
+				printf("中止しました。前のメニューに戻ります。\n");
+				return 0;
+			}
+			else if (choice == 2) {
+				printf("現在の作業に戻ります。\n");
+				return 1;
+			}
 			else printf("入力された内容が不適切です。再入力してください。\n");
 		}
 		else {
@@ -395,6 +403,225 @@ void Save() {
 	fclose(fi);
 	fi = fopen("cache.txt", "w");//キャッシュの削除
 	fclose(fi);
+}
+
+void ChangeName() {
+	char Name[20], r[20];
+	int i, choice;
+
+	for (;;) {
+		printf("ユーザー名を入力してください。\n中断する場合は「quit」と入力してください。\n");
+		printf("->");
+		scanf("%s", Name);
+		if (!strcmp(Name, "quit")) {//中断処理
+			if (!Quit())return;
+		}
+		else break;
+	}
+
+	for (;;) {
+		printf("ユーザー名を「%s」から「%s」に変更しますか？\n1:はい\n2:いいえ\n->", Data.Name, Name);
+		scanf("%s", r);
+		if (strlen(r) == 1) {
+			choice = r[0] - 48;
+			if (choice == 1) {
+				for (i = 0; i < 20; i++) {
+					Data.Name[i] = '\0';
+				}
+				strcpy(Data.Name, Name);
+				printf("ユーザー名の変更が完了しました。\nメニューに戻ります。\n");
+				return;
+			}
+			else if (choice == 2) {
+				printf("ユーザー名を変更せずメニューに戻ります。\n");
+				return;
+			}
+			else printf("入力された内容が不適切です。再入力してください。\n");
+		}
+		else {
+			printf("入力された内容が不適切です。再入力してください。\n");
+		}
+	}
+}
+
+void ChangePass() {
+	char pass[20], Pass[20], re_Pass[20], r[20];
+	int i, choice;
+
+	for (;;) {
+		//Linux用
+		/*
+		struct termios term;
+		struct termios save;
+		char tmp;
+
+		for (;;) {
+		tcgetattr(STDIN_FILENO, &term);
+		save = term;
+		term.c_lflag &= ~ICANON;
+		term.c_lflag &= ~ECHO;
+		tcsetattr(STDIN_FILENO, TCSANOW, &term);
+		tmp = fgetc(stdin);
+		for (i = 0; i <= 20; i++) {
+		re_pass[i] = 0;
+		}
+		printf("現在のパスワードを入力してください。\n中断する場合は「quit」と入力してください。\n");
+		printf("->");
+		for (int j = 0; j < 19; j++) {
+		tmp = fgetc(stdin);
+		if (tmp < 0 || iscntrl(tmp)) {
+		fprintf(stderr, "\n");
+		break;
+		}
+		pass[j] = tmp;
+		fprintf(stderr, "*");
+		}
+		tcsetattr(STDIN_FILENO, TCSANOW, &save);
+		if (!strcmp(pass, "quit")) {//中断処理
+		if (!Quit())return;
+		}
+		else break;
+		}
+		*/
+
+		//windows用
+		for (;;) {
+			printf("現在のパスワードを入力してください。\n中断する場合は「quit」と入力してください。\n");
+			printf("->");
+			system("stty -echo");
+			scanf("%s", pass);
+			system("stty echo");
+			if (!strcmp(pass, "quit")) {//中断処理
+				if (!Quit())return;
+			}
+			else break;
+		}
+
+		//照合
+		if (strcmp(pass, Data.Pass) == 0) {
+			break;
+		}
+		else {
+			printf("現在のパスワードが違います。\n再入力してください。");
+		}
+	}
+
+	//Linux用
+	/*
+	struct termios term;
+	struct termios save;
+	char tmp;
+	for (;;) {
+	for (;;) {
+	tcgetattr(STDIN_FILENO, &term);
+	save = term;
+	term.c_lflag &= ~ICANON;
+	term.c_lflag &= ~ECHO;
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	tmp = fgetc(stdin);
+	printf("新しいパスワードを入力してください。\n中断する場合は「quit」と入力してください。\n");
+	printf("->");
+	for (i = 0; i < 19; i++) {
+	tmp = fgetc(stdin);
+	if (tmp < 0 || iscntrl(tmp)) {
+	fprintf(stderr, "\n");
+	break;
+	}
+	Pass[i] = tmp;
+	fprintf(stderr, "*");
+	}
+	if (!strcmp(Pass, "quit")) {//中断処理
+	if (!Quit())return;
+	}
+	else break;
+	}
+	for (;;) {
+	printf("もう一度新しいパスワードを入力してください。\n中断する場合は「quit」と入力してください。\n");
+	printf("->");
+	for (i = 0; i < sizeof(re_Pass) - 1; i++) {
+	tmp = fgetc(stdin);
+	if (tmp < 0 || iscntrl(tmp)) {
+	fprintf(stderr, "\n");
+	break;
+	}
+	re_Pass[i] = tmp;
+	fprintf(stderr, "*");
+	}
+	tcsetattr(STDIN_FILENO, TCSANOW, &save);
+	if (!strcmp(re_Pass, "quit")) {//中断処理
+	if (!Quit())return;
+	}
+	else break;
+	}
+
+	//パスワードの正誤判定
+	if (strcmp(Pass, re_Pass) == 0) break;
+	else {
+	printf("同じパスワードが入力されていません。Enterを押して再入力してください\n");
+	memset(Pass, '\0', 20);
+	memset(re_Pass, '\0', 20);
+	}
+	}
+	*/
+
+	//windws用
+	for (;;) {
+		for (;;) {
+			printf("新しいパスワードを入力してください。\n中断する場合は「quit」と入力してください。\n");
+			printf("->");
+			system("stty -echo");
+			scanf("%s", Pass);
+			system("stty echo");
+			if (!strcmp(Pass, "quit")) {//中断処理
+				if (!Quit())return;
+			}
+			else break;
+		}
+		for (;;) {
+			printf("もう一度新しいパスワードを入力してください。中断する場合は「quit」と入力してください。\n");
+			printf("->");
+			system("stty -echo");
+			scanf("%s", re_Pass);
+			system("stty echo");
+			if (!strcmp(re_Pass, "quit")) {//中断処理
+				if (!Quit())return;
+			}
+			else break;
+		}
+
+
+		//パスワードの正誤判定
+		if (strcmp(Pass, re_Pass) == 0) break;
+		else {
+			printf("同じパスワードが入力されていません。再入力してください\n");
+			memset(Pass, '\0', 20);
+			memset(re_Pass, '\0', 20);
+		}
+	}
+
+	for (;;) {
+		printf("本当に変更しますか？\n1:はい\n2:いいえ\n->");
+		scanf("%s", r);
+		if (strlen(r) == 1) {
+			choice = r[0] - 48;
+			if (choice == 1) {
+				for (i = 0; i < 20; i++) {
+					Data.Pass[i] = '\0';
+				}
+				strcpy(Data.Pass, Pass);
+				printf("パスワードの変更が完了しました。\nメニューに戻ります。\n");
+				return;
+			}
+			else if (choice == 2) {
+				printf("パスワードを変更せずメニューに戻ります。\n");
+				return;
+			}
+			else printf("入力された内容が不適切です。再入力してください。\n");
+		}
+		else {
+			printf("入力された内容が不適切です。再入力してください。\n");
+		}
+	}
 }
 
 void Kanji() {
