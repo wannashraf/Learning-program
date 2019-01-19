@@ -11,8 +11,8 @@
 #pragma warning(disable:4996)
 
 void Menu();
-void Create();
-void Login();
+int Create();
+int Login();
 void Logout();
 void Save();
 void Kanji();
@@ -83,7 +83,7 @@ void Menu() {
 	}
 }
 
-void Create() {
+int Create() {
 	int i, id;
 	char c, Name[20], Pass[20], re_Pass[20];
 	FILE *fp;
@@ -97,24 +97,29 @@ void Create() {
 	}
 	fclose(fp);
 
-	printf("ユーザー名を入力してください。\n");
-	printf("->");
-	scanf("%s", Name);
+	for (;;) {
+		printf("ユーザー名を入力してください。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
+		printf("->");
+		scanf("%s", Name);
+		if (!strcmp(Name, "quit")) {//中断処理
+			if (!Quit())return 0;
+		}
+		else break;
+	}
 	//Linux用
 	/*
 	struct termios term;
 	struct termios save;
 	char tmp;
 	for (;;) {
-
-
+	for (;;) {
 	tcgetattr(STDIN_FILENO, &term);
 	save = term;
 	term.c_lflag &= ~ICANON;
 	term.c_lflag &= ~ECHO;
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 	tmp = fgetc(stdin);
-	printf("パスワードを入力してください。\n");
+	printf("パスワードを入力してください。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
 	printf("->");
 	for (i = 0; i < 19; i++) {
 	tmp = fgetc(stdin);
@@ -125,8 +130,13 @@ void Create() {
 	Pass[i] = tmp;
 	fprintf(stderr, "*");
 	}
-
-	printf("もう一度パスワードを入力してください。\n");
+	if (!strcmp(Pass, "quit")) {//中断処理
+	if (!Quit())return 0;
+	}
+	else break;
+	}
+	for (;;) {
+	printf("もう一度パスワードを入力してください。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
 	printf("->");
 	for (i = 0; i < sizeof(re_Pass) - 1; i++) {
 	tmp = fgetc(stdin);
@@ -138,6 +148,11 @@ void Create() {
 	fprintf(stderr, "*");
 	}
 	tcsetattr(STDIN_FILENO, TCSANOW, &save);
+	if (!strcmp(re_Pass, "quit")) {//中断処理
+	if (!Quit())return 0;
+	}
+	else break;
+	}
 
 	//パスワードの正誤判定
 	if (strcmp(Pass, re_Pass) == 0) break;
@@ -151,22 +166,34 @@ void Create() {
 
 	//windws用
 	for (;;) {
-		printf("パスワードを入力してください。\n");
-		printf("->");
-		system("stty -echo");
-		scanf("%s", Pass);
-		system("stty echo");
-		printf("もう一度パスワードを入力してください。\n");
-		printf("->");
-		system("stty -echo");
-		scanf("%s", re_Pass);
-		system("stty echo");
+		for (;;) {
+			printf("パスワードを入力してください。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
+			printf("->");
+			system("stty -echo");
+			scanf("%s", Pass);
+			system("stty echo");
+			if (!strcmp(Pass, "quit")) {//中断処理
+				if (!Quit())return 0;
+			}
+			else break;
+		}
+		for (;;) {
+			printf("もう一度パスワードを入力してください。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
+			printf("->");
+			system("stty -echo");
+			scanf("%s", re_Pass);
+			system("stty echo");
+			if (!strcmp(re_Pass, "quit")) {//中断処理
+				if (!Quit())return 0;
+			}
+			else break;
+		}
 
 
 		//パスワードの正誤判定
 		if (strcmp(Pass, re_Pass) == 0) break;
 		else {
-			printf("同じパスワードが入力されていません。Enterを押して再入力してください\n");
+			printf("同じパスワードが入力されていません。再入力してください\n");
 			memset(Pass, '\0', 20);
 			memset(re_Pass, '\0', 20);
 		}
@@ -189,9 +216,11 @@ void Create() {
 	Data.Englevel = 1;
 	Data.Engexp = 0;
 	Data.Days = 1;
+
+	return 1;
 }
 
-void Login() {
+int Login() {
 	char c, id[20];
 	char pass[20];
 	char r_id[20], r_pass[20];
@@ -199,17 +228,24 @@ void Login() {
 
 	for (;;) {
 		printf("---------------------------------------\n");
-		printf("-ID(7桁)を入力してください\n");
-		printf("->");
-		scanf("%s", id);
+		for (;;) {
+			printf("-ID(7桁)を入力してください。\nログインを中断する場合は「quit」と入力してください。\n");
+			printf("->");
+			scanf("%s", id);
+			if (!strcmp(id, "quit")) {//中断処理
+				if (!Quit())return 0;
+			}
+			else break;
+		}
 		printf("---------------------------------------\n");
 
 		//Linux用
 		/*
 		struct termios term;
 		struct termios save;
-		char tmp, re_pass[20];
+		char tmp;
 
+		for (;;) {
 		tcgetattr(STDIN_FILENO, &term);
 		save = term;
 		term.c_lflag &= ~ICANON;
@@ -219,7 +255,7 @@ void Login() {
 		for (i = 0; i <= 20; i++) {
 		re_pass[i] = 0;
 		}
-		printf("パスワードを入力してください。\n");
+		printf("パスワードを入力してください。\nログインを中断する場合は「quit」と入力してください。\n");
 		printf("->");
 		for (int j = 0; j < 19; j++) {
 		tmp = fgetc(stdin);
@@ -227,18 +263,29 @@ void Login() {
 		fprintf(stderr, "\n");
 		break;
 		}
-		re_pass[j] = tmp;
+		pass[j] = tmp;
 		fprintf(stderr, "*");
 		}
 		tcsetattr(STDIN_FILENO, TCSANOW, &save);
+		if (!strcmp(pass, "quit")) {//中断処理
+		if (!Quit())return 0;
+		}
+		else break;
+		}
 		*/
 
 		//windows用
-		printf("パスワードを入力してください。\n");
-		printf("->");
-		system("stty -echo");
-		scanf("%s", pass);
-		system("stty echo");
+		for (;;) {
+			printf("パスワードを入力してください。\nログインを中断する場合は「quit」と入力してください。\n");
+			printf("->");
+			system("stty -echo");
+			scanf("%s", pass);
+			system("stty echo");
+			if (!strcmp(pass, "quit")) {//中断処理
+				if (!Quit())return 0;
+			}
+			else break;
+		}
 
 
 		printf("---------------------------------------\n");
@@ -253,7 +300,9 @@ void Login() {
 			if (c == '\n')i++;
 			else if (c == EOF)break;
 		}
-		if (c == EOF) printf("ログインに失敗しました。再入力して下さい。\n");
+		if (c == EOF) {
+			printf("ログインに失敗しました。再入力して下さい。\n");
+		}
 		fscanf(fp, "%s %s", r_id, r_pass);
 		if (strcmp(pass, r_pass) == 0) {
 			printf("ログインに成功しました。\n");
@@ -261,10 +310,29 @@ void Login() {
 			strcpy(Data.Pass, pass);
 			fscanf(fp, "%s %d %d %d %d %d %d %d", Data.Name, &Data.KanRate, &Data.Kanlevel, &Data.Engexp, &Data.EngRate, &Data.Englevel, &Data.Engexp, &Data.Days);
 			Data.ID = atoi(Data.UserID);
-			break;
+
+			return 1;
 		}
 		else {
 			printf("ログインに失敗しました。再入力して下さい。\n");
+		}
+	}
+}
+
+int Quit() {
+	char r[20];
+	int choice;
+	for (;;) {
+		printf("現在の作業を中断し、前のメニューへ戻りますか？\n1:はい\n2:いいえ\n->");
+		scanf("%s", r);
+		if (strlen(r) == 1) {
+			choice = r[0] - 48;
+			if (choice == 1) return 0;
+			else if (choice == 2) return 1;
+			else printf("入力された内容が不適切です。再入力してください。\n");
+		}
+		else {
+			printf("入力された内容が不適切です。再入力してください。\n");
 		}
 	}
 }
