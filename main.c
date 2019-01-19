@@ -22,11 +22,16 @@ void Status();
 struct Userstats
 {
 	char UserID[20];
+	int ID;
 	char Pass[20];
 	char Name[20];
-	int Rate; //段位
-	int level; //ユーザーレベル
-	int exp; //経験値
+	int KanRate; //漢検段位
+	int Kanlevel; //漢検ユーザーレベル
+	int Kanexp; //漢検経験値
+	int EngRate; //段位
+	int Englevel; //ユーザーレベル
+	int Engexp; //経験値
+	int Days;
 }Data;
 
 
@@ -84,7 +89,7 @@ void Create() {
 	FILE *fp;
 
 	id = 0;
-	fp = fopen("", "r");//情報元ファイル名
+	fp = fopen("UserData.txt", "r");//情報元ファイル名
 	for (;;) {//何番までのIDがあるのか確認
 		c = fgetc(fp);
 		if (c == '\n')id++;
@@ -171,10 +176,19 @@ void Create() {
 	printf("ユーザーIDは%07dです。\n", id);
 	printf("MENU画面に戻ります。\n\n");
 
-	fp = fopen("", "a");//情報元ファイル名
-	fprintf(fp, "%07d %s %s 0 1 1\n", id, Pass, Name);
+	fp = fopen("UserData.txt", "a");//情報元ファイル名
+	fprintf(fp, "%07d %s %s 0 1 0 0 1 0 1\n", id, Pass, Name);//各情報の初期値入力
 	fclose(fp);
-	Login();
+	Data.ID = id;
+	strcpy(Data.Pass, Pass);
+	strcpy(Data.Name, Name);
+	Data.KanRate = 0;
+	Data.Kanlevel = 1;
+	Data.Kanexp = 0;
+	Data.EngRate = 0;
+	Data.Englevel = 1;
+	Data.Engexp = 0;
+	Data.Days = 1;
 }
 
 void Login() {
@@ -231,7 +245,7 @@ void Login() {
 
 		//アカウント探索
 		FILE *fp;
-		fp = fopen("", "r");//情報元ファイル名
+		fp = fopen("UserData.txt", "r");//情報元ファイル名
 		i = 0;
 		for (;;) {
 			if (i == atoi(id))break;
@@ -245,7 +259,8 @@ void Login() {
 			printf("ログインに成功しました。\n");
 			strcpy(Data.UserID, id);
 			strcpy(Data.Pass, pass);
-			fscanf(fp, "%s %d %d %d", Data.Name, &Data.Rate, &Data.level, &Data.exp);
+			fscanf(fp, "%s %d %d %d %d %d %d %d", Data.Name, &Data.KanRate, &Data.Kanlevel, &Data.Engexp, &Data.EngRate, &Data.Englevel, &Data.Engexp, &Data.Days);
+			Data.ID = atoi(Data.UserID);
 			break;
 		}
 		else {
@@ -264,9 +279,13 @@ void Logout() {
 		Data.Pass[i] = '\0';
 		Data.Name[i] = '\0';
 	}
-	Data.Rate = 0;
-	Data.level = 0;
-	Data.exp = 0;
+	Data.KanRate = 0;
+	Data.Kanlevel = 0;
+	Data.Kanexp = 0;
+	Data.EngRate = 0;
+	Data.Englevel = 0;
+	Data.Engexp = 0;
+	Data.Days = 0;
 }
 
 void Save() {
@@ -274,7 +293,7 @@ void Save() {
 	char c;
 	int p;
 
-	fp = fopen("", "r");//情報元ファイル名
+	fp = fopen("UserData.txt", "r");//情報元ファイル名
 	fi = fopen("cache.txt", "w");
 	for (;;) {
 		c = fgetc(fp);
@@ -284,7 +303,7 @@ void Save() {
 	fclose(fp);
 	fclose(fi);
 
-	fp = fopen("", "w");//情報元ファイル名
+	fp = fopen("UserData.txt", "w");//情報元ファイル名
 	fi = fopen("cache.txt", "r");
 
 	for (p = 0; p != atoi(Data.UserID); p++) {//複写
@@ -294,8 +313,8 @@ void Save() {
 			if (c == '\n' || c == EOF)break;
 		}
 	}
-	fprintf(fp, "%s %s %s %d %d %d\n", Data.UserID, Data.Pass, Data.Name, Data.Rate, Data.level, Data.exp);//更新
-	for (;;) {
+	fprintf(fp, "%07d %s %s %d %d %d %d %d %d %d\n", Data.ID, Data.Pass, Data.Name, Data.KanRate, Data.Kanlevel, Data.Engexp, Data.EngRate, Data.Englevel, Data.Engexp, Data.Days);//更新
+	for (;;) {//旧データの読み飛ばし
 		c = fgetc(fi);
 		if (c == '\n' || c == EOF)break;
 	}
@@ -306,7 +325,7 @@ void Save() {
 	}
 	fclose(fp);
 	fclose(fi);
-	fi = fopen("cache.txt", "w");
+	fi = fopen("cache.txt", "w");//キャッシュの削除
 	fclose(fi);
 }
 
