@@ -34,7 +34,8 @@ struct Userstats
 	int EngRate; //段位
 	int Englevel; //ユーザーレベル
 	int Engexp; //経験値
-	int Days;
+	int Days; //累計ログイン
+	int ContDays; //連続ログイン
 }Data;
 
 
@@ -172,9 +173,9 @@ int Create() {
 		for (;;) {
 			printf("パスワードを入力してください。\n後から変更できます。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
 			printf("->");
-			system("stty -echo");
+			//system("stty -echo");
 			scanf("%s", Pass);
-			system("stty echo");
+			//system("stty echo");
 			if (!strcmp(Pass, "quit")) {//中断処理
 				if (!Quit())return 0;
 			}
@@ -183,9 +184,9 @@ int Create() {
 		for (;;) {
 			printf("もう一度パスワードを入力してください。\nアカウント作成を中断する場合は「quit」と入力してください。\n");
 			printf("->");
-			system("stty -echo");
+			//system("stty -echo");
 			scanf("%s", re_Pass);
-			system("stty echo");
+			//system("stty echo");
 			if (!strcmp(re_Pass, "quit")) {//中断処理
 				if (!Quit())return 0;
 			}
@@ -207,7 +208,7 @@ int Create() {
 	printf("MENU画面に戻ります。\n\n");
 
 	fp = fopen("UserData.txt", "a");//情報元ファイル名
-	fprintf(fp, "%07d %s %s 0 1 0 0 1 0 1\n", id, Pass, Name);//各情報の初期値入力
+	fprintf(fp, "%07d %s %s 0 1 0 0 1 0 0 1\n", id, Pass, Name);//各情報の初期値入力
 	fclose(fp);
 	Data.ID = id;
 	strcpy(Data.Pass, Pass);
@@ -218,7 +219,8 @@ int Create() {
 	Data.EngRate = 0;
 	Data.Englevel = 1;
 	Data.Engexp = 0;
-	Data.Days = 1;
+	Data.Days = 0;
+	Data.ContDays = 1;
 
 	return 1;
 }
@@ -281,9 +283,9 @@ int Login() {
 		for (;;) {
 			printf("パスワードを入力してください。\nログインを中断する場合は「quit」と入力してください。\n");
 			printf("->");
-			system("stty -echo");
+			//system("stty -echo");
 			scanf("%s", pass);
-			system("stty echo");
+			//system("stty echo");
 			if (!strcmp(pass, "quit")) {//中断処理
 				if (!Quit())return 0;
 			}
@@ -311,7 +313,7 @@ int Login() {
 			printf("ログインに成功しました。\n");
 			strcpy(Data.UserID, id);
 			strcpy(Data.Pass, pass);
-			fscanf(fp, "%s %d %d %d %d %d %d %d", Data.Name, &Data.KanRate, &Data.Kanlevel, &Data.Engexp, &Data.EngRate, &Data.Englevel, &Data.Engexp, &Data.Days);
+			fscanf(fp, "%s %d %d %d %d %d %d %d %d", Data.Name, &Data.KanRate, &Data.Kanlevel, &Data.Engexp, &Data.EngRate, &Data.Englevel, &Data.Engexp, &Data.Days, &Data.ContDays);
 			Data.ID = atoi(Data.UserID);
 
 			return 1;
@@ -363,6 +365,7 @@ void Logout() {
 	Data.Englevel = 0;
 	Data.Engexp = 0;
 	Data.Days = 0;
+	Data.ContDays = 0;
 }
 
 void Save() {
@@ -390,7 +393,7 @@ void Save() {
 			if (c == '\n' || c == EOF)break;
 		}
 	}
-	fprintf(fp, "%07d %s %s %d %d %d %d %d %d %d\n", Data.ID, Data.Pass, Data.Name, Data.KanRate, Data.Kanlevel, Data.Engexp, Data.EngRate, Data.Englevel, Data.Engexp, Data.Days);//更新
+	fprintf(fp, "%07d %s %s %d %d %d %d %d %d %d %d\n", Data.ID, Data.Pass, Data.Name, Data.KanRate, Data.Kanlevel, Data.Engexp, Data.EngRate, Data.Englevel, Data.Engexp, Data.Days, Data.ContDays);//更新
 	for (;;) {//旧データの読み飛ばし
 		c = fgetc(fi);
 		if (c == '\n' || c == EOF)break;
@@ -489,9 +492,9 @@ void ChangePass() {
 		for (;;) {
 			printf("現在のパスワードを入力してください。\n中断する場合は「quit」と入力してください。\n");
 			printf("->");
-			system("stty -echo");
+			//system("stty -echo");
 			scanf("%s", pass);
-			system("stty echo");
+			//system("stty echo");
 			if (!strcmp(pass, "quit")) {//中断処理
 				if (!Quit())return;
 			}
@@ -570,20 +573,20 @@ void ChangePass() {
 		for (;;) {
 			printf("新しいパスワードを入力してください。\n中断する場合は「quit」と入力してください。\n");
 			printf("->");
-			system("stty -echo");
+			//system("stty -echo");
 			scanf("%s", Pass);
-			system("stty echo");
+			//system("stty echo");
 			if (!strcmp(Pass, "quit")) {//中断処理
 				if (!Quit())return;
 			}
 			else break;
 		}
 		for (;;) {
-			printf("もう一度新しいパスワードを入力してください。中断する場合は「quit」と入力してください。\n");
+			printf("もう一度新しいパスワードを入力してください。\n中断する場合は「quit」と入力してください。\n");
 			printf("->");
-			system("stty -echo");
+			//system("stty -echo");
 			scanf("%s", re_Pass);
-			system("stty echo");
+			//system("stty echo");
 			if (!strcmp(re_Pass, "quit")) {//中断処理
 				if (!Quit())return;
 			}
